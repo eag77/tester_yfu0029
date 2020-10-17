@@ -21,9 +21,10 @@ int main(void)
 	DDRF = 0;
 	DDRG = (1<<PG0);
 	SetV(0);
+	init_uart(9600);
 	
 	float V1 = GetVADC1();
-	float R5 = GetRADC5();
+	float R5 = GetR_A13();
 	
     while (1) 
     {
