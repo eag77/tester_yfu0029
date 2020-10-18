@@ -40,7 +40,7 @@ int uart_putchar(char c, FILE *stream)
 
 static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
-static void init_uart(uint32_t BAUD)
+static void uart_init(uint32_t BAUD)
 {
 	rs485_len_indata = 0;
 	TXEDDR |= (1<<TXEPIN);
@@ -94,33 +94,14 @@ int uart_transmite(char c)
 #define PARITY_ERROR (1<<UPE0)
 #define DATA_OVERRUN (1<<DOR0)
 
-ISR(USART_RX_vect)
+ISR(USART0_RX_vect)
 {
 	char status=UCSR0A;
 	char data=UDR0;
 	if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
 	{
 		RXbuf[RXCount]=data;
-		
-		if(RXCount==3)
-		{
-			RXLed = data;
-			RXCount++;
-		}
-		else
-		if(StrLed[RXCount]==data)
-		{
-			RXCount++;
-			if(RXCount>=6)
-			{
-				USART_State = 1;
-				RXCount=0;
-			}
-		}
-		else
-		{
-			RXCount=0;
-		}
+		RXCount++;
 	}
 }
 
