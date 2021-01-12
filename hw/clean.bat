@@ -1,0 +1,1 @@
+del *.DBK *.PWI *.lbk *.rte *.do *.edf *.log *.sdf *.sts
