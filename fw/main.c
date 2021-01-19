@@ -7,6 +7,7 @@
 #define  F_CPU 16000000
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/wdt.h>
 #define pwmdac10b
 #include "pwmdac.h"
 #include "adc.h"
@@ -109,6 +110,7 @@ void TestQUITN(uint8_t Vin, uint8_t Vout, uint8_t Res)
 
 int main(void)
 {
+	wdt_enable(WDTO_2S);
 	DDRA = 0;
 	DDRB = (1<<PB7)|(1<<PB6)|(1<<PB5);
 	DDRC = 0;
@@ -121,28 +123,29 @@ int main(void)
 	sei();
 	SetV(0);
 	uart_init(9600);
-	printf("Тестер ЯФУ-0029\n");
+	printf("\n\nТестер ЯФУ-0029\n");
 //	printf("Tester YFU-0029\n");
-//	_delay_ms(100);
+	_delay_ms(100);
 	GetVSupply();
+	wdt_reset();
 	printf("Питание:\n", V5);
 	printf(" +5В: %fВ\n", V5);
 	printf("+15В: %fВ\n", V15);
 	printf("-15В: %fВ\n", V15n);
 	
-	if (V15n > 11.0f)
+	if (V15n > -11.0f)
 	{
 		printf("Отрицательное напряжение питания %f меньше допустимого!\n", V15n);
 	}
 
 	if (V15 < 11.0f)
 	{
-		printf("Положительное напряжение питания %f меньше допустимого!\n", V15n);
+		printf("Положительное напряжение питания %f меньше допустимого!\n", V15);
 	}
 
 	if ((V5 < 4.95f)||(V5 > 5.05))
 	{
-		printf("5В напряжение: %f. Оно является опорным!\n", V15n);
+		printf("5В напряжение: %f. Оно является опорным!\n", V5);
 	}
 	
 	if (!EN_State)
@@ -194,6 +197,8 @@ int main(void)
 	
 	uint8_t QS = Q123_State;
 	uint8_t QES = QE123_State;
+	
+	wdt_reset();
 	
 	if ((V0 < 2.48)||(V0 > 2.52))
 	{
@@ -256,6 +261,17 @@ int main(void)
 	
     while (1) 
     {
+/*		for (int i=0; i<11; i++)
+		{
+			SetV((float)i);
+			_delay_ms(100);
+		}
+
+		for (int i=0; i<11; i++)
+		{
+			SetV((float)-i);
+			_delay_ms(100);
+		}*/
     }
 }
 

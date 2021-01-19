@@ -13,22 +13,12 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-void SetVREF256()
-{
-	ADMUX = (3 << REFS0);	//AVCC with external capacitor at AREF pin
-	_delay_ms(500);
-}
-
-void SetVREF5()
-{
-	ADMUX = (1 << REFS0);	//AVCC with external capacitor at AREF pin
-	_delay_ms(500);
-}
-
 uint16_t GetADC(uint8_t ch)
 {
-	SetVREF5();
+	ADCSRA = 0;
+	ADMUX = 0;
 	ADMUX = (1 << REFS0)|(ch&7);	//AVCC with external capacitor at AREF pin
+	_delay_ms(500);
 	ADCSRA = (1 << ADEN)|(0 << ADFR)|(1 << ADPS2)|(1 << ADPS1)|(1 << ADPS0);	//ADC Prescaler Select Bits
 	ADCSRA |= (1 << ADSC);			//ADC Start Conversion
 	while((ADCSRA&(1<<ADIF))==0);
@@ -37,8 +27,10 @@ uint16_t GetADC(uint8_t ch)
 
 uint16_t GetADC256(uint8_t ch)
 {
-	SetVREF256();
-	ADMUX = (3 << REFS0)|(ch&7);	//Internal 2.56V Voltage Reference with external capacitor at AREF pin
+	ADCSRA = 0;
+	ADMUX = 0;
+	ADMUX = (1 << REFS1)|(1 << REFS0)|(ch&7);	//Internal 2.56V Voltage Reference with external capacitor at AREF pin
+	_delay_ms(500);
 	ADCSRA = (1 << ADEN)|(0 << ADFR)|(1 << ADPS2)|(1 << ADPS1)|(1 << ADPS0);	//ADC Prescaler Select Bits
 	ADCSRA |= (1 << ADSC);			//ADC Start Conversion
 	while((ADCSRA&(1<<ADIF))==0);
